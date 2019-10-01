@@ -72,7 +72,7 @@ The final step is to draw the tracked lane back to the original image.
 ##### Final Step
 ![final image](./road_img.png)
 
-Link to video: [video_result.mp4](./video_results.mp4)
+Link to video: [video_result.mp4](./video_results_resubmit3.mp4)
 
 ---
 Discussion
