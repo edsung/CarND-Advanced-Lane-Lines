@@ -44,23 +44,23 @@ Step 4 Perspective Transform
 The perspective transform is performed by passing the image  that has been masked by a trapezoid into the function p_transform(). Within this function are two Opencv functions called getPerspectiveTransforr() and warpPerspective(). The first function finds the matrix that transform the source point on the image to destination points and the second function performs the transform.
 
 ##### Masked Image
-![masked image](../Downloads/masked_img.png)
+![masked image](./masked_img.png)
 ##### Transformed Image
-![transformed image](../Downloads/transformed_img.png)
+![transformed image](./transformed_img.png)
 ---
 Step 5 Finding Lane Pixels and Polynomial fit
 ---
 Histogram of the transformed image is takes along the x-axis to find the base of the two lines. The nonzero y and x coordinates found and the coordinates are windowed to organized into (x,y) coordinates for left line or right line. This is performed by the find_lane_pixels() function in the code. The polynomial fit is calculated by the fit_poly() function in code. The function uses numpy's polyfit() function to find the coefficients of a second degree polynomial. The windows and the polynomial are both onto the transformed image. The left line shown in red and right line shown in blue.
 
 ##### Polynomial Fit and Finding Lane Pixel Image
-![poly image](../Downloads/poly_img.png)
+![poly image](./poly_img.png)
 ---
 Step 6 Radius of Curvature and Offset from center
 ---
 The radius of curvature is calculated using the measure_curvature_real() function in the code. The y and x values are converted into meters and ran the values through numpy's polyfit() function to get the radius of curvature in meters. The offset from the center of the camera position is calculated by taking the difference between the center of the image and midpoint between the left and right line.
 
 ##### Radius of Curvature and Offset from center
-![original image](../Downloads/test2.jpg)
+![original image](./test2.jpg)
 left curvature is 1393.33 m and right curve is 1393.33 m
 Offset is 0.58 m
 
@@ -70,7 +70,7 @@ The Final Step
 The final step is to draw the tracked lane back to the original image.
 
 ##### Final Step
-![final image](../Downloads/road_img.png)
+![final image](./road_img.png)
 
 Link to video: [video_result.mp4](./video_results.mp4)
 
