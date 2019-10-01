@@ -1,16 +1,4 @@
-## Advanced Lane Finding
-[![Udacity - Self-Driving Car NanoDegree](https://s3.amazonaws.com/udacity-sdc/github/shield-carnd.svg)](http://www.udacity.com/drive)
-![Lanes Image](./examples/example_output.jpg)
-
-In this project, your goal is to write a software pipeline to identify the lane boundaries in a video, but the main output or product we want you to create is a detailed writeup of the project.  Check out the [writeup template](https://github.com/udacity/CarND-Advanced-Lane-Lines/blob/master/writeup_template.md) for this project and use it as a starting point for creating your own writeup.  
-
-Creating a great writeup:
----
-A great writeup should include the rubric points as well as your description of how you addressed each point.  You should include a detailed description of the code used in each step (with line-number references and code snippets where necessary), and links to other supporting documents or external references.  You should include images in your writeup to demonstrate how your code works with examples.  
-
-All that said, please be concise!  We're not looking for you to write a book here, just a brief description of how you passed each rubric point, and references to the relevant code :). 
-
-You're not required to use markdown for your writeup.  If you use another method please just submit a pdf of your writeup.
+# Advanced Lane Finding
 
 The Project
 ---
@@ -26,14 +14,76 @@ The goals / steps of this project are the following:
 * Warp the detected lane boundaries back onto the original image.
 * Output visual display of the lane boundaries and numerical estimation of lane curvature and vehicle position.
 
-The images for camera calibration are stored in the folder called `camera_cal`.  The images in `test_images` are for testing your pipeline on single frames.  If you want to extract more test images from the videos, you can simply use an image writing method like `cv2.imwrite()`, i.e., you can read the video in frame by frame as usual, and for frames you want to save for later you can write to an image file.  
+Step 1 Camera Calibration
+---
 
-To help the reviewer examine your work, please save examples of the output from each stage of your pipeline in the folder called `output_images`, and include a description in your writeup for the project of what each image shows.    The video called `project_video.mp4` is the video your pipeline should work well on.  
+Camera needs to be calibrated to correct for distortions as the image. Chessboard test images provided are processed by the findChessboardCorners. Corner points on the test image are found and are used to calibrate the camera using the calibrateCamera() function.  
 
-The `challenge_video.mp4` video is an extra (and optional) challenge for you if you want to test your pipeline under somewhat trickier conditions.  The `harder_challenge.mp4` video is another optional challenge and is brutal!
 
-If you're feeling ambitious (again, totally optional though), don't stop there!  We encourage you to go out and take video of your own, calibrate your camera and show us how you would implement this project from scratch!
 
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
+Step 2 Distortion Correction
+---
+The cal_distort function will take images passed in and undistort the image based on parameters from calibrateCamera
+![image1](./distortion-corrected_cal_img.jpg)
 
+Example of distortion corrected image:
+![image2](./distortion-corrected_img.jpg)
+
+Step 3 Color transforms, gradient thresholded image
+---
+The basis of lane finding is to filter or threshold out the road and extraneous things from the image. This objective is achieved through using the L Channel and S Channel from HLS colorspace and V channel from the HSV colorspace. The thresholded images are combined using bitwise_and() and bitwise_or() functions to reduce as much residue from the lanes as much as possible. The images below are an example:
+
+##### Original Image
+![original image](./test2.jpg)
+
+##### Binary Image
+![binary image](./binary_img.jpg)
+---
+Step 4 Perspective Transform
+---
+The perspective transform is performed by passing the image  that has been masked by a trapezoid into the function p_transform(). Within this function are two Opencv functions called getPerspectiveTransforr() and warpPerspective(). The first function finds the matrix that transform the source point on the image to destination points and the second function performs the transform.
+
+##### Masked Image
+![masked image](../Downloads/masked_img.png)
+##### Transformed Image
+![transformed image](../Downloads/transformed_img.png)
+---
+Step 5 Finding Lane Pixels and Polynomial fit
+---
+Histogram of the transformed image is takes along the x-axis to find the base of the two lines. The nonzero y and x coordinates found and the coordinates are windowed to organized into (x,y) coordinates for left line or right line. This is performed by the find_lane_pixels() function in the code. The polynomial fit is calculated by the fit_poly() function in code. The function uses numpy's polyfit() function to find the coefficients of a second degree polynomial. The windows and the polynomial are both onto the transformed image. The left line shown in red and right line shown in blue.
+
+##### Polynomial Fit and Finding Lane Pixel Image
+![poly image](../Downloads/poly_img.png)
+---
+Step 6 Radius of Curvature and Offset from center
+---
+The radius of curvature is calculated using the measure_curvature_real() function in the code. The y and x values are converted into meters and ran the values through numpy's polyfit() function to get the radius of curvature in meters. The offset from the center of the camera position is calculated by taking the difference between the center of the image and midpoint between the left and right line.
+
+##### Radius of Curvature and Offset from center
+![original image](../Downloads/test2.jpg)
+left curvature is 1393.33 m and right curve is 1393.33 m
+Offset is 0.58 m
+
+---
+The Final Step
+---
+The final step is to draw the tracked lane back to the original image.
+
+##### Final Step
+![final image](../Downloads/road_img.png)
+
+Link to video: [video_result.mp4](./video_results.mp4)
+
+---
+Discussion
+---
+##### Problems and Issues
+- One of the main issues was thresholding the image. If the image had strong daylight spread across the line, then the HLS colorspace, S channel, will likely cause the polynomial not to fit well.
+- From the video, it is noticeable that when the car bounces the lane tracking becomes wobbly.
+- The lane finding algorithm would likely to fail when...
+     - The trivial case is when there are no line to detect or only one side of the lane is detected.
+     - The lane line can't be approximated by a second degree polynomial.
+
+##### Potential Improvements
+- An improvement would be to have a way to select what colorspace to get the lane line.
+- To average the lane lines over time.
